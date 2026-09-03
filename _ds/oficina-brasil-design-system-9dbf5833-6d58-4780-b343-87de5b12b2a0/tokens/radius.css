@@ -1,0 +1,9 @@
+:root{
+  --radius:12px;                  /* base — rounded-lg */
+  --radius-sm:10px;               /* calc(--radius - 4px), clamped in source */
+  --radius-md:10px;               /* calc(--radius - 2px) */
+  --radius-lg:12px;
+  --radius-xl:16px;
+  --radius-full:9999px;
+  --radius-checkbox:6px;          /* fixed 6px: the token radius looks wrong at 20px */
+}
