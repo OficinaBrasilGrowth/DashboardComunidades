@@ -1,0 +1,307 @@
+{
+  "name": "@oficinabrasilgrowth/oficina-brasil-design-system",
+  "version": "1.0.0-rc.1",
+  "private": false,
+  "license": "UNLICENSED",
+  "author": "Germinal Editora e Marketing Ltda.",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "overrides": {
+    "esbuild": "^0.28.2"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "typecheck:lib": "tsc -p tsconfig.lib.json --noEmit",
+    "test": "playwright test",
+    "build:lib": "npm run generate:exports && tsup && npm run build:css",
+    "verify:lib": "node scripts/verify-lib-build.js",
+    "prepack": "npm run build:lib && npm run verify:lib",
+    "test:visual": "playwright test tests/visual-regression.spec.ts",
+    "test:functional": "playwright test --grep-invert \"regressão visual|dark mode:\"",
+    "test:dark-mode": "playwright test --grep \"dark mode:\"",
+    "generate:exports": "node scripts/generate-exports.js",
+    "verify:exports": "node scripts/generate-exports.js --check",
+    "build:css": "tailwindcss -i app/globals.css -o dist/styles.css && node scripts/append-font-face.js",
+    "verify:portable": "node scripts/verify-portable-imports.js",
+    "verify:tokens": "node scripts/verify-token-source.js",
+    "verify:pack": "node scripts/verify-pack.js"
+  },
+  "dependencies": {
+    "next": "^16.3.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^20.14.10",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "recharts": "^2.12.7",
+    "tailwindcss": "^4.3.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.5.4"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./accordion": {
+      "types": "./dist/accordion.d.ts",
+      "import": "./dist/accordion.mjs",
+      "require": "./dist/accordion.js"
+    },
+    "./admin-page-header": {
+      "types": "./dist/admin-page-header.d.ts",
+      "import": "./dist/admin-page-header.mjs",
+      "require": "./dist/admin-page-header.js"
+    },
+    "./alert": {
+      "types": "./dist/alert.d.ts",
+      "import": "./dist/alert.mjs",
+      "require": "./dist/alert.js"
+    },
+    "./alert-dialog": {
+      "types": "./dist/alert-dialog.d.ts",
+      "import": "./dist/alert-dialog.mjs",
+      "require": "./dist/alert-dialog.js"
+    },
+    "./avatar": {
+      "types": "./dist/avatar.d.ts",
+      "import": "./dist/avatar.mjs",
+      "require": "./dist/avatar.js"
+    },
+    "./avatar-group": {
+      "types": "./dist/avatar-group.d.ts",
+      "import": "./dist/avatar-group.mjs",
+      "require": "./dist/avatar-group.js"
+    },
+    "./badge": {
+      "types": "./dist/badge.d.ts",
+      "import": "./dist/badge.mjs",
+      "require": "./dist/badge.js"
+    },
+    "./bar-chart": {
+      "types": "./dist/bar-chart.d.ts",
+      "import": "./dist/bar-chart.mjs",
+      "require": "./dist/bar-chart.js"
+    },
+    "./brand-select": {
+      "types": "./dist/brand-select.d.ts",
+      "import": "./dist/brand-select.mjs",
+      "require": "./dist/brand-select.js"
+    },
+    "./breadcrumb": {
+      "types": "./dist/breadcrumb.d.ts",
+      "import": "./dist/breadcrumb.mjs",
+      "require": "./dist/breadcrumb.js"
+    },
+    "./button": {
+      "types": "./dist/button.d.ts",
+      "import": "./dist/button.mjs",
+      "require": "./dist/button.js"
+    },
+    "./chart-card": {
+      "types": "./dist/chart-card.d.ts",
+      "import": "./dist/chart-card.mjs",
+      "require": "./dist/chart-card.js"
+    },
+    "./checkbox": {
+      "types": "./dist/checkbox.d.ts",
+      "import": "./dist/checkbox.mjs",
+      "require": "./dist/checkbox.js"
+    },
+    "./command-palette": {
+      "types": "./dist/command-palette.d.ts",
+      "import": "./dist/command-palette.mjs",
+      "require": "./dist/command-palette.js"
+    },
+    "./considerations": {
+      "types": "./dist/considerations.d.ts",
+      "import": "./dist/considerations.mjs",
+      "require": "./dist/considerations.js"
+    },
+    "./copy-button": {
+      "types": "./dist/copy-button.d.ts",
+      "import": "./dist/copy-button.mjs",
+      "require": "./dist/copy-button.js"
+    },
+    "./data-table": {
+      "types": "./dist/data-table.d.ts",
+      "import": "./dist/data-table.mjs",
+      "require": "./dist/data-table.js"
+    },
+    "./date-picker": {
+      "types": "./dist/date-picker.d.ts",
+      "import": "./dist/date-picker.mjs",
+      "require": "./dist/date-picker.js"
+    },
+    "./dropdown-menu": {
+      "types": "./dist/dropdown-menu.d.ts",
+      "import": "./dist/dropdown-menu.mjs",
+      "require": "./dist/dropdown-menu.js"
+    },
+    "./empty-state": {
+      "types": "./dist/empty-state.d.ts",
+      "import": "./dist/empty-state.mjs",
+      "require": "./dist/empty-state.js"
+    },
+    "./file-upload-button": {
+      "types": "./dist/file-upload-button.d.ts",
+      "import": "./dist/file-upload-button.mjs",
+      "require": "./dist/file-upload-button.js"
+    },
+    "./filter-bar": {
+      "types": "./dist/filter-bar.d.ts",
+      "import": "./dist/filter-bar.mjs",
+      "require": "./dist/filter-bar.js"
+    },
+    "./icon-button": {
+      "types": "./dist/icon-button.d.ts",
+      "import": "./dist/icon-button.mjs",
+      "require": "./dist/icon-button.js"
+    },
+    "./icons": {
+      "types": "./dist/icons.d.ts",
+      "import": "./dist/icons.mjs",
+      "require": "./dist/icons.js"
+    },
+    "./info-tooltip": {
+      "types": "./dist/info-tooltip.d.ts",
+      "import": "./dist/info-tooltip.mjs",
+      "require": "./dist/info-tooltip.js"
+    },
+    "./input": {
+      "types": "./dist/input.d.ts",
+      "import": "./dist/input.mjs",
+      "require": "./dist/input.js"
+    },
+    "./kpi-card": {
+      "types": "./dist/kpi-card.d.ts",
+      "import": "./dist/kpi-card.mjs",
+      "require": "./dist/kpi-card.js"
+    },
+    "./label": {
+      "types": "./dist/label.d.ts",
+      "import": "./dist/label.mjs",
+      "require": "./dist/label.js"
+    },
+    "./line-chart": {
+      "types": "./dist/line-chart.d.ts",
+      "import": "./dist/line-chart.mjs",
+      "require": "./dist/line-chart.js"
+    },
+    "./modal": {
+      "types": "./dist/modal.d.ts",
+      "import": "./dist/modal.mjs",
+      "require": "./dist/modal.js"
+    },
+    "./multi-select": {
+      "types": "./dist/multi-select.d.ts",
+      "import": "./dist/multi-select.mjs",
+      "require": "./dist/multi-select.js"
+    },
+    "./pagination": {
+      "types": "./dist/pagination.d.ts",
+      "import": "./dist/pagination.mjs",
+      "require": "./dist/pagination.js"
+    },
+    "./popover": {
+      "types": "./dist/popover.d.ts",
+      "import": "./dist/popover.mjs",
+      "require": "./dist/popover.js"
+    },
+    "./progress-bar": {
+      "types": "./dist/progress-bar.d.ts",
+      "import": "./dist/progress-bar.mjs",
+      "require": "./dist/progress-bar.js"
+    },
+    "./progress-ring": {
+      "types": "./dist/progress-ring.d.ts",
+      "import": "./dist/progress-ring.mjs",
+      "require": "./dist/progress-ring.js"
+    },
+    "./radio-group": {
+      "types": "./dist/radio-group.d.ts",
+      "import": "./dist/radio-group.mjs",
+      "require": "./dist/radio-group.js"
+    },
+    "./skeleton": {
+      "types": "./dist/skeleton.d.ts",
+      "import": "./dist/skeleton.mjs",
+      "require": "./dist/skeleton.js"
+    },
+    "./slider": {
+      "types": "./dist/slider.d.ts",
+      "import": "./dist/slider.mjs",
+      "require": "./dist/slider.js"
+    },
+    "./stat-comparison": {
+      "types": "./dist/stat-comparison.d.ts",
+      "import": "./dist/stat-comparison.mjs",
+      "require": "./dist/stat-comparison.js"
+    },
+    "./switch": {
+      "types": "./dist/switch.d.ts",
+      "import": "./dist/switch.mjs",
+      "require": "./dist/switch.js"
+    },
+    "./tabs": {
+      "types": "./dist/tabs.d.ts",
+      "import": "./dist/tabs.mjs",
+      "require": "./dist/tabs.js"
+    },
+    "./textarea": {
+      "types": "./dist/textarea.d.ts",
+      "import": "./dist/textarea.mjs",
+      "require": "./dist/textarea.js"
+    },
+    "./toast": {
+      "types": "./dist/toast.d.ts",
+      "import": "./dist/toast.mjs",
+      "require": "./dist/toast.js"
+    },
+    "./tooltip": {
+      "types": "./dist/tooltip.d.ts",
+      "import": "./dist/tooltip.mjs",
+      "require": "./dist/tooltip.js"
+    },
+    "./tree-view": {
+      "types": "./dist/tree-view.d.ts",
+      "import": "./dist/tree-view.mjs",
+      "require": "./dist/tree-view.js"
+    },
+    "./visually-hidden-input": {
+      "types": "./dist/visually-hidden-input.d.ts",
+      "import": "./dist/visually-hidden-input.mjs",
+      "require": "./dist/visually-hidden-input.js"
+    }
+  },
+  "peerDependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "recharts": "^2.12.7"
+  }
+}

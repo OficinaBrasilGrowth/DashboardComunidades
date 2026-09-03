@@ -1,0 +1,120 @@
+name: CI
+
+# Roda em todo push e pull request — Fases 1, 1.5, 3 e 6 do ROADMAP.md.
+#
+# typecheck + build existem porque um erro de tipo real (useRef no
+# Checkbox, Ago 2026) só apareceu no `next build`, nunca no `tsc --noEmit`
+# isolado — se ninguém tivesse rodado os dois manualmente, teria ido pro
+# repositório quebrado.
+#
+# Os testes E2E (Fase 3) existem porque, sem eles no CI, um PR pode
+# reintroduzir um bug já corrigido antes (ex: BrandSelect com w-64 fixo de
+# volta, causando a mesma sobreposição visual que já foi corrigida) e nada
+# alerta ninguém — a suíte da Fase 2 só tem valor real rodando aqui,
+# automaticamente, não só quando alguém lembra de rodar na sua máquina.
+#
+# O build da biblioteca + verify:lib (Fase 6) garantem que a promessa de
+# tree-shaking por componente (importar Badge não traz o Recharts junto)
+# continua verdadeira a cada mudança — não só checada uma vez manualmente.
+#
+# Testes funcionais e de regressão visual rodam em passos separados (não
+# um só `npm test`) — a suíte inteira junta passou de 5 minutos e estourou
+# o limite de uma chamada de ferramenta durante o desenvolvimento, e
+# separar deixa mais claro qual categoria falhou quando algo quebra.
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  typecheck-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.9'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Typecheck da biblioteca (TECH-01, Ago 2026) — cobre components/ diretamente
+        # Achado real: tsconfig.json (usado por `npm run typecheck` acima)
+        # inclui só app/ e lib/ — um componente em components/ só é
+        # verificado se for importado por alguma página. tsconfig.lib.json
+        # já existia no projeto (criado pro build da lib), mas nunca tinha
+        # sido conectado a um gate de CI — ficava rodando só localmente,
+        # manualmente, se alguém lembrasse. Confirmado com um erro de tipo
+        # de teste real: `npm run typecheck` sozinho não pegava um erro
+        # introduzido de propósito num componente não importado por
+        # nenhuma página; `npm run typecheck:lib` pegou de verdade.
+        run: npm run typecheck:lib
+
+      - name: Verificar exports do pacote (DS-01/DS-02, Sprint 1 de consolidação)
+        run: npm run verify:exports
+
+      - name: Verificar imports portáveis (MIGRATION.md, Sprint 1 de consolidação)
+        run: npm run verify:portable
+
+      - name: Verificar fonte única de tokens (Sprint 2 de consolidação)
+        run: npm run verify:tokens
+
+      - name: Build de produção (app Next.js)
+        run: npm run build
+
+      - name: Build da biblioteca (tsup)
+        run: npm run build:lib
+
+      - name: Verificar tree-shaking e "use client" da biblioteca
+        run: npm run verify:lib
+
+      - name: Verificar o tarball real (empacotamento confiável pra release)
+        # Confirma o mesmo tarball que `npm publish` geraria de verdade —
+        # não só que dist/ existe localmente, mas que os arquivos
+        # essenciais (entry points, tipos, CSS, fonte, licença) chegam
+        # até o pacote publicado. Dispara o prepack (build:lib +
+        # verify:lib) de novo por conta própria, então funciona mesmo em
+        # checkout limpo, sem depender do passo de build acima ter rodado.
+        run: npm run verify:pack
+
+      # Cache dos binários de browser do Playwright — sem isso, todo run
+      # baixaria o Chromium do zero (~150MB), o que deixaria o CI bem mais
+      # lento à toa numa dependência que muda raramente entre commits.
+      - name: Cache dos browsers do Playwright
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ hashFiles('package-lock.json') }}
+
+      - name: Instalar browsers do Playwright (só se não veio do cache)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Instalar dependências de sistema do Playwright (quando veio do cache)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Testes funcionais (Playwright Test + axe-core)
+        run: npm run test:functional
+
+      # Separado do passo acima de propósito: a suíte de regressão visual
+      # (tests/visual-regression.spec.ts) tem uma limitação conhecida — as
+      # imagens de referência foram geradas no Chromium de um sandbox de
+      # desenvolvimento, não pelo `npx playwright install chromium` que
+      # roda aqui. A primeira rodada real neste workflow pode falhar por
+      # diferença sutil de renderização entre as duas builds do Chromium,
+      # não por bug de verdade. Se isso acontecer, regenere as imagens de
+      # referência RODANDO NO PRÓPRIO CI (não localmente), commitando o
+      # resultado — ver o comentário completo no início do arquivo de teste.
+      - name: Testes de regressão visual
+        run: npm run test:visual

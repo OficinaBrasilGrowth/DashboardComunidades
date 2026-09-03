@@ -1,0 +1,45 @@
+© 2026 Germinal Editora e Marketing Ltda. Todos os direitos reservados.
+
+LICENÇA PROPRIETÁRIA — TODOS OS DIREITOS RESERVADOS
+
+Titular jurídico: Germinal Editora e Marketing Ltda. (CNPJ
+00.833.328/0001-99), doravante "a Titular", operando sob a marca
+"Oficina Brasil".
+
+Este software, incluindo mas não se limitando a código-fonte, tokens
+de design, assets de marca (cores, tipografia, ícones) e documentação
+associada (em conjunto, o "Software"), é propriedade exclusiva da
+Titular.
+
+1. Restrição de uso
+
+Nenhuma parte do Software pode ser copiada, modificada, distribuída,
+sublicenciada, publicada ou usada, no todo ou em parte, exceto por
+pessoas e projetos expressamente autorizados pela Titular. O Software
+não é distribuído sob uma licença de código aberto — o uso é restrito
+a projetos e equipes autorizados internamente.
+
+2. Isenção de garantias
+
+O SOFTWARE É FORNECIDO "COMO ESTÁ", SEM GARANTIA DE QUALQUER TIPO,
+EXPRESSA OU IMPLÍCITA, INCLUINDO MAS NÃO SE LIMITANDO ÀS GARANTIAS DE
+COMERCIALIZAÇÃO, ADEQUAÇÃO A UM PROPÓSITO ESPECÍFICO E NÃO VIOLAÇÃO.
+
+3. Limitação de responsabilidade
+
+EM NENHUMA HIPÓTESE A TITULAR SERÁ RESPONSÁVEL POR QUALQUER
+RECLAMAÇÃO, DANO OU OUTRA RESPONSABILIDADE, SEJA EM AÇÃO DE CONTRATO,
+ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE DE, OU EM CONEXÃO COM O
+SOFTWARE OU O USO OU OUTRAS NEGOCIAÇÕES NO SOFTWARE.
+
+4. Lei aplicável
+
+Esta licença é regida pelas leis da República Federativa do Brasil.
+
+5. Exceção — fonte tipográfica
+
+A fonte Figtree, distribuída junto com o Software em `dist/fonts/` e
+`public/fonts/`, **não** está sujeita a esta licença proprietária. Ela
+é licenciada separadamente sob os termos da SIL Open Font License,
+versão 1.1 — ver `licenses/FIGTREE-OFL.txt`. Essa exceção se aplica
+somente ao arquivo da fonte em si, não ao restante do Software.

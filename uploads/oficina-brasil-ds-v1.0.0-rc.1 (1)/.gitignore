@@ -1,0 +1,33 @@
+# Dependencies
+/node_modules
+
+# Next.js build output
+/.next/
+/out/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Playwright Test — Fase 2 do ROADMAP.md
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Build da biblioteca (tsup) — Fase 6 do ROADMAP.md
+/dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor/OS
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: transparent; overflow: hidden; }
+  #map { width: 100%; height: 100%; display: block; }
+  .uf-label { font: 700 9px 'Figtree', Arial, sans-serif; fill: var(--label-fg, #565D78); pointer-events: none; }
+</style>
+</head>
+<body>
+<svg id="map"></svg>
+<script>
+// UF sigla lookup by normalized state name and by IBGE numeric code (robust to unknown property schemas).
+var NAME_TO_UF = {
+  "acre":"AC","alagoas":"AL","amapa":"AP","amazonas":"AM","bahia":"BA","ceara":"CE",
+  "distritofederal":"DF","espiritosanto":"ES","goias":"GO","maranhao":"MA","matogrosso":"MT",
+  "matogrossodosul":"MS","minasgerais":"MG","para":"PA","paraiba":"PB","parana":"PR",
+  "pernambuco":"PE","piaui":"PI","riodejaneiro":"RJ","riograndedonorte":"RN","riograndedosul":"RS",
+  "rondonia":"RO","roraima":"RR","santacatarina":"SC","saopaulo":"SP","sergipe":"SE","tocantins":"TO"
+};
+var IBGE_TO_UF = {
+  "11":"RO","12":"AC","13":"AM","14":"RR","15":"PA","16":"AP","17":"TO","21":"MA","22":"PI","23":"CE",
+  "24":"RN","25":"PB","26":"PE","27":"AL","28":"SE","29":"BA","31":"MG","32":"ES","33":"RJ","35":"SP",
+  "41":"PR","42":"SC","43":"RS","50":"MS","51":"MT","52":"GO","53":"DF"
+};
+function normalize(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z]/g,''); }
+function ufFromProps(p, fallbackId){
+  if (!p) p = {};
+  var direct = p.sigla || p.SIGLA || p.uf || p.UF || p.abbrev || p.iso_a2 || p.postal;
+  if (direct && direct.length === 2) return direct.toUpperCase();
+  var name = p.nome || p.NOME || p.name || p.NAME_1 || p.NM_ESTADO || p.NM_UF;
+  if (name && NAME_TO_UF[normalize(name)]) return NAME_TO_UF[normalize(name)];
+  var code = String(p.id || p.ID || p.CD_GEOCUF || p.codigo_ibg || fallbackId || '').replace(/\D/g,'').slice(0,2);
+  if (IBGE_TO_UF[code]) return IBGE_TO_UF[code];
+  return null;
+}
+
+window.renderBrazilMap = function(config){
+  var colorByUf = config.colorByUf || {};
+  var defaultFill = config.defaultFill || '#E9EBF3';
+  var strokeColor = config.strokeColor || '#FFFFFF';
+  var labelColor = config.labelColor || '#565D78';
+  var highlightLabelColor = config.highlightLabelColor || '#FFFFFF';
+  var highlightUfs = config.highlightUfs || [];
+
+  var svg = d3.select('#map');
+  var url = 'https://gist.githubusercontent.com/ruliana/1ccaaab05ea113b0dff3b22be3b4d637/raw/196c0332d38cb935cfca227d28f7cecfa70b412e/br-states.json';
+
+  d3.json(url).then(function(topo){
+    var objName = Object.keys(topo.objects)[0];
+    var geo = topojson.feature(topo, topo.objects[objName]);
+
+    function currentSize(){
+      var r = svg.node().getBoundingClientRect();
+      return [r.width || 520, r.height || 380];
+    }
+
+    var size = currentSize();
+    var width = size[0], height = size[1];
+    svg.attr('viewBox', '0 0 ' + width + ' ' + height).attr('preserveAspectRatio', 'xMidYMid meet');
+
+    var projection = d3.geoMercator().fitSize([width, height], geo);
+    var path = d3.geoPath().projection(projection);
+
+    var g = svg.append('g');
+    g.selectAll('path')
+      .data(geo.features)
+      .enter()
+      .append('path')
+      .attr('d', path)
+      .attr('fill', function(d, i){
+        var uf = ufFromProps(d.properties, i);
+        d.__uf = uf;
+        return (uf && colorByUf[uf]) || defaultFill;
+      })
+      .attr('stroke', strokeColor)
+      .attr('stroke-width', 1.5)
+      .attr('stroke-linejoin', 'round');
+
+    g.selectAll('text')
+      .data(geo.features.filter(function(d){ return highlightUfs.indexOf(d.__uf) !== -1; }))
+      .enter()
+      .append('text')
+      .attr('class', 'uf-label')
+      .attr('x', function(d){ return path.centroid(d)[0]; })
+      .attr('y', function(d){ return path.centroid(d)[1]; })
+      .attr('text-anchor', 'middle')
+      .attr('dy', '0.32em')
+      .attr('fill', highlightLabelColor)
+      .text(function(d){ return d.__uf; });
+
+    window.addEventListener('resize', function(){
+      var s = currentSize();
+      svg.attr('viewBox', '0 0 ' + s[0] + ' ' + s[1]);
+      projection.fitSize(s, geo);
+      g.selectAll('path').attr('d', path);
+      g.selectAll('text.uf-label')
+        .attr('x', function(d){ return path.centroid(d)[0]; })
+        .attr('y', function(d){ return path.centroid(d)[1]; });
+    });
+
+    window.parent.postMessage({ type: 'brasil-map-ready' }, '*');
+  }).catch(function(err){
+    svg.append('text').attr('x', 10).attr('y', 20).attr('font-size', 12).attr('fill', '#9198B0').text('Mapa indisponível');
+    window.parent.postMessage({ type: 'brasil-map-error', error: String(err) }, '*');
+  });
+};
+
+renderBrazilMap({
+  colorByUf: { SP: '#00134E', MG: '#18328A' },
+  defaultFill: '#E9EBF3',
+  strokeColor: '#FFFFFF',
+  highlightUfs: ['SP', 'MG'],
+  highlightLabelColor: '#FFFFFF'
+});
+</script>
+<template id="__bundler_thumbnail"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#00134E"/><text x="50" y="55" font-size="28" fill="#90F252" text-anchor="middle" font-family="Arial" font-weight="bold">BR</text></svg></template>
+</body>
+</html>

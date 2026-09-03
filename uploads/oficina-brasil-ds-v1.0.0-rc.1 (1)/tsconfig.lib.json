@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": []
+  },
+  "include": ["components/**/*.tsx", "index.ts"],
+  "exclude": ["node_modules", "app", ".next"]
+}

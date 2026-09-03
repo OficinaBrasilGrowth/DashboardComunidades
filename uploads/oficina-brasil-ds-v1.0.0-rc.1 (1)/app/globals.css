@@ -1,0 +1,353 @@
+@import "tailwindcss";
+
+:root {
+  /* === BASE === */
+  --background: #FFFFFF;
+  --foreground: #00134E; /* azulEscuro — dark navy reads as primary text color throughout the guide */
+
+  /* === CARD === */
+  --card: #FFFFFF;
+  --card-foreground: #00134E;
+
+  /* === POPOVER / DROPDOWN / TOOLTIP === */
+  --popover: #FFFFFF;
+  --popover-foreground: #00134E;
+
+  /* === PRIMARY === */
+  --primary: #18328A;          /* azul */
+  --primary-foreground: #FFFFFF; /* approved: azul bg -> branco, always */
+
+  /* === SECONDARY (light tint) === */
+  --secondary: #DAF7EF;        /* azulClaro */
+  --secondary-foreground: #00134E; /* approved: azulClaro bg -> azulEscuro, always */
+
+  /* === MUTED ===
+     Confirmed by design (Aug 2026): subtle azulEscuro tint (Option B).
+     Not in the original brand guide, but validated before adoption. */
+  --muted: #F5F6FA;
+  --muted-foreground: #565D78;
+
+  /* === ACCENT (turquoise, headings/dividers only) === */
+  --accent: #00B7A4;           /* turquesa */
+  --accent-foreground: #00134E; /* approved: turquesa bg -> azulEscuro, always */
+
+  /* === DESTRUCTIVE ===
+     Confirmed by design (Aug 2026): classic red, chosen for clear
+     distinction from the brand's Verde and unambiguous urgency signaling.
+
+     CORRIGIDO (Sprint 2 de consolidação, Ago 2026) — achado real de
+     revisão externa: um único token --destructive tentava representar
+     duas funções incompatíveis (cor de TEXTO sobre --background/--card, e
+     cor de FUNDO sólido de botão/badge com texto branco por cima). Prova
+     concreta do problema: o AlertDialog precisava ignorar o token e usar
+     #D14343 fixo, porque a versão clareada de --destructive no dark mode
+     (pensada pra funcionar como texto) falha contraste como fundo sólido
+     com texto branco. Separado em 5 sub-tokens, cada um com uma única
+     responsabilidade — light e dark escolhem os valores certos pra cada
+     papel, sem ambiguidade. */
+  --destructive-text: #D14343;              /* cor de texto sobre --background/--card */
+  --destructive-surface: #D14343;           /* fundo sólido de botão/badge — mesmo valor em light E dark, contraste é interno ao componente, não depende do tema ao redor */
+  --destructive-surface-foreground: #FFFFFF; /* texto sobre --destructive-surface */
+  --destructive-subtle: #FBEAEA;            /* fundo claro de alerta (Alert) */
+  --destructive-subtle-foreground: #BC3C3C; /* texto sobre --destructive-subtle — escurecido, achado real via axe-core (Fase 2 do ROADMAP.md) */
+  --destructive-border: #D14343;
+
+  /* === SUCCESS / WARNING / INFO ===
+     Sprint 2 de consolidação, Lote 2 do 2D (Ago 2026) — mesma estrutura de
+     responsabilidade única do destructive acima. Decisão de design
+     confirmada: --success-surface usa TURQUESA, não verde (Alert/Badge
+     usavam verde, Toast/FileUploadButton já usavam turquesa — turquesa
+     escolhido como o canônico). Turquesa só é aprovado com azulEscuro como
+     texto, nunca branco — contrast-rules.ts, tabela do guia de marca. */
+  --success-surface: #008476;              /* turquesa escurecida — decisão de produto (Ago 2026, DESIGN-02): texto branco em todos os contextos de superfície turquesa, não mais azulEscuro. #00B7A4 original falhava com branco (2,53:1) — escurecido pra permitir, calculado e confirmado, não estimado */
+  --success-surface-foreground: #FFFFFF;   /* 4,60:1 com o novo tom */
+  --success-subtle: #E0F6F4;              /* gerado — tinta clara de turquesa, não vem do guia de marca */
+  --success-subtle-foreground: #00134E;
+  --success-border: #00B7A4;
+
+  --warning-surface: #A2551D;              /* laranja escurecido — mesmo tom já usado em --warning-subtle-foreground. Achado real de revisão visual (Ago 2026, DESIGN-01): o laranja original (#E8792A) passava WCAG AA tecnicamente (5,98:1 com azulEscuro), mas a leitura ficava inconsistente com as outras variantes do Badge, que usam texto branco sobre fundo saturado — essa era a única (com Ativo/turquesa) usando texto escuro. Escurecido pra permitir branco, unificando a linguagem visual */
+  --warning-surface-foreground: #FFFFFF;   /* 5.45:1 com o novo tom, calculado, não estimado */
+  --warning-subtle: #FDF0E6;              /* gerado — ver semanticTints em lib/tokens.ts */
+  --warning-subtle-foreground: #A2551D;   /* escurecido — 4.87:1, Fase 2 do ROADMAP.md */
+  --warning-border: #E8792A;
+
+  --info-surface: #18328A;                /* azul — self-contido, mesmo valor em light/dark como o destructive-surface */
+  --info-surface-foreground: #FFFFFF;
+  --info-subtle: #DAF7EF;                 /* azulClaro — cor real do guia de marca, não gerada */
+  --info-subtle-foreground: #18328A;
+  --info-border: #18328A;
+
+  /* === ELEVATION / SHADOWS / FOCUS ===
+     Sprint 2 de consolidação, 2F (Ago 2026) — achado real de revisão
+     externa: 44 ocorrências de rgba() hardcoded em 19 arquivos, incluindo
+     componentes que já "pareciam" sem cor solta (Modal, Popover, Input).
+     Catalogando os valores reais, vários eram quase-duplicados
+     divergentes sem intenção (ex: sombra de popover com opacidade 0.05/0.08
+     em 5 lugares, mas 0.1/0.12 e 0.1/0.15 em outros 2 — provavelmente
+     drift de digitar o valor à mão toda vez, não 3 níveis de elevação
+     diferentes de propósito). Consolidado numa escala de 4 níveis + anéis
+     de foco + sombra de overlay, todos com mesmo valor em light/dark
+     (sombra não muda de tom com o tema, só existe pra dar profundidade). */
+  --shadow-xs: 0 1px 2px rgba(10, 10, 10, 0.15);
+  --shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.05), 0 4px 12px rgba(10, 10, 10, 0.07);
+  --shadow-md: 0 4px 6px rgba(10, 10, 10, 0.06), 0 10px 24px rgba(10, 10, 10, 0.1);
+  --shadow-lg: 0 20px 25px rgba(10, 10, 10, 0.12), 0 8px 10px rgba(10, 10, 10, 0.09);
+  --shadow-overlay-backdrop: rgba(10, 10, 10, 0.4);
+  --shadow-button-primary: 0 1px 2px rgba(24, 50, 138, 0.2);
+  --focus-ring-primary: 0 0 0 3px rgba(24, 50, 138, 0.12);
+  --focus-ring-destructive: 0 0 0 3px rgba(209, 67, 67, 0.12);
+
+  /* === STAT INDICATOR (StatComparison) ===
+     GERADO, NÃO ESPECIFICADO PELA MARCA — turquesa escurecida (achado real
+     via axe-core, Fase 2 do ROADMAP.md: a turquesa original do guia
+     #00B7A4 media só 2.53:1 sobre fundo branco, abaixo do mínimo 4.5:1). */
+  --stat-positive: #008073;
+
+  /* === BORDERS & INPUTS ===
+     Confirmed by design (Aug 2026): subtle azulEscuro tint (Option B). */
+  --border: #D3D7E4;
+  --input: #D3D7E4;
+  --ring: var(--primary);
+
+  /* === BORDER RADIUS ===
+     Confirmed by design (Aug 2026): 12px. Not numerically specified in the
+     brand guide, but validated against the "Box" graphic element (page 58)
+     and approved as the project's standard radius. */
+  --radius: 0.75rem;
+
+  /* === CHART COLORS === */
+  --chart-1: #18328A; /* azul */
+  --chart-2: #00B7A4; /* turquesa */
+  --chart-3: #90F252; /* verde */
+  --chart-4: #00134E; /* azulEscuro */
+  --chart-5: #5B6270; /* neutral gray, generated */
+
+  /* === BRAND-SPECIFIC EXTRAS (not part of the shadcn default set) === */
+  --brand-verde: #90F252;
+  --brand-verde-foreground: #00134E; /* NEVER white — see contrast-rules.ts */
+  --brand-azul-escuro: #00134E;
+  --brand-azul-escuro-foreground-verde: #90F252; /* approved large+body per table */
+  --brand-azul-escuro-foreground: #FFFFFF; /* também aprovado por contrast-rules.ts — Sprint 2, completando o par que faltava pro uso em CopyButton/Tooltip */
+  --brand-azul-claro: #DAF7EF;
+  /* Sprint 2, Lote 3 do 2D (Ago 2026) — completando os tokens de marca
+     fixa que faltavam. Usados quando a API expõe a cor de marca como
+     intenção explícita (ex: <AdminPageHeader color="azul">) — o
+     componente quer literalmente azul, não "a cor primária do tema atual"
+     (que pode virar verde no dark mode). Diferente de --primary/
+     --secondary, esses NUNCA mudam entre light/dark. */
+  --brand-azul: #18328A;
+  --brand-azul-foreground: #FFFFFF; /* aprovado — contrast-rules.ts */
+  --brand-turquesa: #00B7A4;
+  --brand-turquesa-foreground: #00134E; /* única combinação aprovada pra turquesa como REFERÊNCIA DE COR — nunca branco. Ver --brand-turquesa-surface abaixo pro uso como FUNDO/superfície */
+  /* Decisão de produto (Ago 2026, DESIGN-02): texto branco em todos os
+     contextos de SUPERFÍCIE turquesa (fundo colorido com texto por
+     cima) — mas a primitive de marca pura (--brand-turquesa acima)
+     continua #00B7A4, inalterada, pra quem só precisa referenciar "a
+     cor turquesa da marca" sem ser como fundo. Usado por
+     AdminPageHeader/KpiCard na opção de cor "turquesa". Mesmo valor de
+     --success-surface (mesma decisão, fontes conceituais diferentes:
+     uma é "a marca escolheu turquesa", a outra é "isso significa
+     sucesso") — ver Lote 3 do 2D no CONSOLIDATION.md pro raciocínio de
+     não conflar tokens de marca com tokens semânticos mesmo quando o
+     valor coincide. */
+  --brand-turquesa-surface: #008476;
+  --brand-turquesa-surface-foreground: #FFFFFF;
+  --brand-azul-claro-foreground: #18328A;
+  --brand-branco: #FFFFFF;
+  --brand-branco-foreground: #00134E; /* aprovado por simetria — azulEscuro já aceita branco como texto (contrast-rules.ts) */
+}
+
+.dark {
+  /* Auditoria da Fase 4 (ROADMAP.md, Ago 2026): os valores abaixo foram
+     testados de verdade com axe-core contra as 30 páginas de componentes
+     com cor, não só assumidos como corretos por inverter os tokens claros.
+     5 bugs reais de contraste encontrados e corrigidos aqui: --destructive
+     nunca tinha sido de fato adaptado pro dark mode (era o mesmo valor
+     idêntico ao light mode, clareado agora pra passar contraste contra os
+     dois fundos escuros do tema — página e card); --stat-positive é um
+     token novo, criado porque o StatComparison usava uma cor de indicador
+     "positivo" calculada inline em JS sem nenhuma variante de dark mode. */
+  --background: #00134E;       /* azulEscuro as page background */
+  --foreground: #DAF7EF;       /* azulClaro reads well on azulEscuro, per table */
+
+  --card: #122568;             /* slightly lighter navy, generated */
+  --card-foreground: #DAF7EF;
+
+  --popover: #122568;
+  --popover-foreground: #DAF7EF;
+
+  --primary: #90F252;          /* verde reads as an accent on dark bg per table */
+  --primary-foreground: #00134E; /* verde pairs with azulEscuro text, never white */
+
+  --secondary: #18328A;
+  --secondary-foreground: #FFFFFF;
+
+  --muted: #122568;
+  --muted-foreground: #9AA1AC;
+
+  --accent: #00B7A4;
+  --accent-foreground: #00134E;
+
+  --destructive-text: #DF7B7B;               /* clareado - achado via axe-core (Fase 4), o valor original media 3.81:1 contra os fundos escuros do tema */
+  --destructive-surface: #D14343;            /* mesmo valor do light mode — fundo sólido de botão/badge não depende do tema ao redor */
+  --destructive-surface-foreground: #FFFFFF; /* mesmo valor do light mode, pelo mesmo motivo */
+  --destructive-subtle: #3F1414;             /* vermelho escurecido em direção ao preto (Sprint 2) — a tinta clara do light mode (#FBEAEA) ficaria deslocada visualmente sobre um tema escuro */
+  --destructive-subtle-foreground: #DF7B7B;  /* mesmo valor do destructive-text — 5.49:1 contra o novo subtle escuro, calculado, não estimado */
+  --destructive-border: #DF7B7B;
+
+  /* === SUCCESS / WARNING / INFO — dark mode ===
+     surface/surface-foreground mantêm o mesmo valor do light mode — fundo
+     sólido de badge/toast é self-contido, o contraste não depende do tema
+     ao redor (mesmo raciocínio do --destructive-surface). Só subtle e seu
+     foreground mudam, porque precisam de um tom apropriado pro fundo
+     escuro da página — a tinta clara do light mode ficaria deslocada
+     visualmente aqui, igual ao destructive-subtle já resolvia. */
+  --success-surface: #008476;
+  --success-surface-foreground: #FFFFFF;
+  --success-subtle: #002E29;              /* turquesa escurecida em direção ao preto */
+  --success-subtle-foreground: #00B7A4;   /* turquesa puro — 5.84:1 contra o subtle escuro, calculado */
+  --success-border: #00B7A4;
+
+  --warning-surface: #A2551D;
+  --warning-surface-foreground: #FFFFFF;
+  --warning-subtle: #3A1E0A;              /* laranja escurecida em direção ao preto */
+  --warning-subtle-foreground: #E8792A;   /* laranja puro — 5.26:1 contra o subtle escuro, calculado */
+  --warning-border: #E8792A;
+
+  --info-surface: #18328A;
+  --info-surface-foreground: #FFFFFF;
+  --info-subtle: #060C22;                 /* azul escurecido em direção ao preto */
+  --info-subtle-foreground: #DAF7EF;      /* azulClaro — 16.70:1 contra o subtle escuro; azul puro sozinho falhava (1.68:1), achado real */
+  --info-border: #18328A;
+  --stat-positive: #4CA69D; /* clareado pro mesmo motivo, contra o card escuro */
+
+  --border: #233B62;
+  --input: #233B62;
+  --ring: var(--primary);
+}
+
+@theme inline {
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive-text: var(--destructive-text);
+  --color-destructive-surface: var(--destructive-surface);
+  --color-destructive-surface-foreground: var(--destructive-surface-foreground);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-destructive-subtle-foreground: var(--destructive-subtle-foreground);
+  --color-destructive-border: var(--destructive-border);
+
+  --color-success-surface: var(--success-surface);
+  --color-success-surface-foreground: var(--success-surface-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-subtle-foreground: var(--success-subtle-foreground);
+  --color-success-border: var(--success-border);
+
+  --color-warning-surface: var(--warning-surface);
+  --color-warning-surface-foreground: var(--warning-surface-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-subtle-foreground: var(--warning-subtle-foreground);
+  --color-warning-border: var(--warning-border);
+
+  --color-info-surface: var(--info-surface);
+  --color-info-surface-foreground: var(--info-surface-foreground);
+  --color-info-subtle: var(--info-subtle);
+  --color-info-subtle-foreground: var(--info-subtle-foreground);
+  --color-info-border: var(--info-border);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-verde: var(--brand-verde);
+  --color-brand-verde-foreground: var(--brand-verde-foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  /* Corrigido (Sprint 1 de consolidação, Ago 2026): usa var(--font-figtree),
+     gerada pelo next/font/local em app/layout.tsx, não mais o literal
+     'Figtree' sozinho — next/font ofusca o nome interno da fonte de
+     propósito. Bug real encontrado testando com um consumidor da
+     biblioteca sem next/font: var() sem fallback interno torna a
+     declaração INTEIRA de font-family inválida quando a variável não
+     existe (não só "pula" pro próximo item da lista) — corrigido com um
+     fallback dentro do próprio var(), que tenta o literal 'Figtree' antes
+     de cair pra Arial/sans-serif. O CSS distribuído (dist/styles.css)
+     também ganha um @font-face real e portável — ver build:css no
+     package.json — pra funcionar sem depender do next/font. */
+  font-family: var(--font-figtree, 'Figtree'), Arial, sans-serif;
+}
+
+/* Global fix (Aug 2026): browsers don't apply a pointer cursor to <button>
+   by default (only <a> gets that automatically) — found during manual
+   review that none of the 19 components set this, meaning every button
+   in the whole design system looked non-interactive on hover. Fixed once,
+   globally, instead of patching all 19 files individually — also covers
+   any custom element using role="button" (e.g. BrandSelect's clear "×"). */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+/* Estilo do thumb do Slider — não dá pra fazer só com classes do Tailwind,
+   os pseudo-elementos de thumb de input[type=range] exigem prefixo de
+   fornecedor (::-webkit-slider-thumb, ::-moz-range-thumb), cada um com
+   sintaxe própria que não pode ficar numa classe utilitária genérica. */
+input[type='range'].ds-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+input[type='range'].ds-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--muted);
+}
+input[type='range'].ds-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #18328A;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 3px rgba(10, 10, 10, 0.3);
+  margin-top: -6px;
+  cursor: pointer;
+}
+input[type='range'].ds-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--muted);
+}
+input[type='range'].ds-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #18328A;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 3px rgba(10, 10, 10, 0.3);
+  cursor: pointer;
+}
+input[type='range'].ds-slider:disabled::-webkit-slider-thumb {
+  background: var(--muted-foreground);
+  cursor: not-allowed;
+}
+input[type='range'].ds-slider:disabled::-moz-range-thumb {
+  background: var(--muted-foreground);
+  cursor: not-allowed;
+}
